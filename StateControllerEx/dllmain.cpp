@@ -7,7 +7,7 @@ auto SCtrlParseElemType = reinterpret_cast<bool (*)(TPFILE* tpf, STATE_INFO* sin
 auto SCtrlRCElemFree = reinterpret_cast<void (*)(STATE_INFO* sinfo)>(0x4718d0);
 auto ConstExpI = reinterpret_cast<void (*)(EVAL_EXP* ptr, int value)>(0x406f20);
 auto ConstExpF = reinterpret_cast<void (*)(EVAL_EXP* ptr, float value)>(0x406fa0);
-auto EvalExpressionI = reinterpret_cast<int (*)(PLAYER* p, EVAL_EXP* ptr, int warnNo) > (0x4075e0);
+auto EvalExpressionI = reinterpret_cast<int (*)(PLAYER* p, EVAL_EXP* ptr, int warnNo)>(0x4075e0);
 auto EvalExpressionF = reinterpret_cast<float (*)(PLAYER* p, EVAL_EXP* ptr)>(0x4076d0);
 
 int findTargetStateByName(string);
