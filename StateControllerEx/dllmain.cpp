@@ -1,0 +1,175 @@
+﻿// dllmain.cpp : DLL アプリケーションのエントリ ポイントを定義します。
+#include "pch.h"
+#include "Mebius.h"
+#include "StateControllerEx.h"
+
+static bool (* const SCtrlParseElemType)(TPFILE* tpf, STATE_INFO* sinfo, PLAYER_CACHE* pcache) = reinterpret_cast<bool (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(0x46aa60);
+static void (* const SCtrlRCElemFree)(STATE_INFO* sinfo) = reinterpret_cast<void (*)(STATE_INFO*)>(0x4718d0);
+static void (* const ConstExpI)(EVAL_EXP* ptr, int value) = reinterpret_cast<void (*)(EVAL_EXP*, int)>(0x406f20);
+static void (* const ConstExpF)(EVAL_EXP* ptr, float value) = reinterpret_cast<void (*)(EVAL_EXP*, float)>(0x406fa0);
+static int (* const EvalExpressionI)(PLAYER*  p, EVAL_EXP* ptr, int warnNo) = reinterpret_cast<int (*)(PLAYER*, EVAL_EXP*, int) > (0x4075e0);
+static float (* const EvalExpressionF)(PLAYER* p, EVAL_EXP* ptr) = reinterpret_cast<float (*)(PLAYER * , EVAL_EXP*)>(0x4076d0);
+
+int findTargetStateByName(string);
+int regModState(int);
+int procModState(void);
+void freeModState(void);
+
+struct STATE {
+    string statename = "";
+    DWORD regFunc = -1;
+    DWORD procFunc = -1;
+    DWORD freeFunc = -1;
+};
+vector<STATE*> gStateList;
+DWORD STATEID = 0x7FFFFFFF;
+
+// 補助関数
+void constExp(EVAL_EXP* ptr, int value) {
+    ConstExpI(ptr, value);
+    return;
+}
+
+void constExp(EVAL_EXP* ptr, float value) {
+    ConstExpF(ptr, value);
+    return;
+}
+
+int EvalExpression(PLAYER* p, EVAL_EXP* ptr, int warnNo) {
+    return EvalExpressionI(p,ptr,warnNo);
+}
+
+float EvalExpression(PLAYER* p, EVAL_EXP* ptr) {
+    return EvalExpressionF(p,ptr);
+}
+
+
+// 本処理
+int findTargetStateByName(string statename) {
+    for (size_t i = 0; i < gStateList.size(); i++) {
+        if (gStateList[i]->statename == statename) {
+            return static_cast<int>(i);
+        }
+    }
+    return HOOK_NOT_FOUND;
+}
+
+void addState(string statename, DWORD regFunc, DWORD procFunc, DWORD freeFunc) {
+    if (findTargetStateByName(statename) == -1) {
+        STATE* s = new STATE;
+        s->statename = statename;
+        s->regFunc = regFunc;
+        s->procFunc = procFunc;
+        s->freeFunc = freeFunc;
+        gStateList.push_back(s);
+    }
+    return;
+}
+
+int regModState(int RETVALUE) {
+    if (RETVALUE == 1) return RETVALUE;
+
+    char* mugen_error = (char*)*((DWORD*)0x4b5b4c) + 0xC534;
+    char* error = (char*)"Not a ";
+    if (strncmp(mugen_error, error, 6) == 0) {
+
+        DWORD* stack;
+        _asm {
+            MOV stack, EBP
+            ADD stack, 0x44
+        }
+        TPFILE* tpf = (TPFILE*)*(stack);
+        STATE_INFO* sinfo = (STATE_INFO*)*(stack + 1);
+        PLAYER_CACHE* pcache = (PLAYER_CACHE*)*(stack + 2);
+
+        // ステコン名から番号取得
+        string statename(mugen_error + 23);
+        int index = findTargetStateByName(statename);
+        // 見つからなければエラー
+        if (index == -1) return RETVALUE;
+
+        // ID登録
+        sinfo->stateid = STATEID;
+        sinfo->substateid = index;
+        // エラー削除
+        mugen_error[0] = '\x0';
+
+        auto reg = reinterpret_cast<void (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(gStateList[index]->regFunc);
+        reg(tpf, sinfo, pcache);
+
+        return TRUE;
+    }
+    else {
+        return RETVALUE;
+    }
+}
+
+int procModState(void) {
+    DWORD* stack;
+    _asm {
+        MOV stack, EBP
+        ADD stack, 0x10A8
+    }
+    PLAYER* p = (PLAYER*)*(stack);
+    STATE_INFO* sinfo = (STATE_INFO*)*(stack + 1);
+
+    if (sinfo->stateid != STATEID) return TRUE;
+    auto proc = reinterpret_cast<int (*)(PLAYER * , STATE_INFO*)>(gStateList[sinfo->substateid]->procFunc);
+    proc(p, sinfo);
+    return FALSE;
+}
+
+void freeModState(void) {
+    DWORD* stack;
+    _asm {
+        MOV stack, EBP
+        ADD stack, 0x30
+    }
+
+    STATE_INFO* sinfo = (STATE_INFO*)*(stack);
+
+    if (sinfo->stateid != STATEID) return;
+    auto free = reinterpret_cast<int (*)(STATE_INFO*)>(gStateList[sinfo->substateid]->freeFunc);
+    free(sinfo);
+
+    return;
+}
+
+
+BOOL APIENTRY DllMain( HMODULE hModule,
+                       DWORD  ul_reason_for_call,
+                       LPVOID lpReserved
+                     )
+{
+    switch (ul_reason_for_call)
+    {
+    case DLL_PROCESS_ATTACH: {
+        // ステート登録フック
+        Hook((DWORD)SCtrlParseElemType, (DWORD)regModState, TAIL);
+
+        // ステート処理埋め込み
+        writeGotoOpcode((DWORD)0x471554, (DWORD)procModState, CALL);
+        BYTE proc[37] = {
+            0x85,0xC0,0x74,0x25,0x68,0x78,0xC3,0x4A,
+            0x00,0xA1,0x4C,0x5B,0x4B,0x00,0x05,0x34,
+            0xC5,0x00,0x00,0x50,0xE8,0xE5,0x0C,0x02,
+            0x00,0x83,0xC4,0x08,0xE8,0xE6,0x42,0xFA,
+            0xFF,0x90,0x90,0x90,0x90 };
+        writeBytesToROM((DWORD)0x471559, proc, sizeof(proc));
+
+        // ステート開放フック
+        Hook((DWORD)SCtrlRCElemFree, (DWORD)freeModState, HEAD);
+
+        LoadAllDLL("mods", ".stc");
+        break;
+    }
+    case DLL_THREAD_ATTACH:
+    case DLL_THREAD_DETACH:
+    case DLL_PROCESS_DETACH: {
+        FreeAllDLL("mods", ".stc");
+        break;
+    }
+    }
+    return TRUE;
+}
+
