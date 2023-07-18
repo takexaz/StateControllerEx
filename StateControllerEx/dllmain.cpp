@@ -76,7 +76,7 @@ int regModState(int RETVALUE) {
         DWORD* stack;
         _asm {
             MOV stack, EBP
-            ADD stack, 0x44
+            ADD stack, 0x2C
         }
         TPFILE* tpf = (TPFILE*)*(stack);
         STATE_INFO* sinfo = (STATE_INFO*)*(stack + 1);
@@ -121,7 +121,7 @@ void freeModState(void) {
     DWORD* stack;
     _asm {
         MOV stack, EBP
-        ADD stack, 0x30
+        ADD stack, 0x20
     }
 
     STATE_INFO* sinfo = (STATE_INFO*)*(stack);
