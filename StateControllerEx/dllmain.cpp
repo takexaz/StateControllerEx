@@ -3,12 +3,12 @@
 #include "Mebius.h"
 #include "StateControllerEx.h"
 
-static bool (* const SCtrlParseElemType)(TPFILE* tpf, STATE_INFO* sinfo, PLAYER_CACHE* pcache) = reinterpret_cast<bool (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(0x46aa60);
-static void (* const SCtrlRCElemFree)(STATE_INFO* sinfo) = reinterpret_cast<void (*)(STATE_INFO*)>(0x4718d0);
-static void (* const ConstExpI)(EVAL_EXP* ptr, int value) = reinterpret_cast<void (*)(EVAL_EXP*, int)>(0x406f20);
-static void (* const ConstExpF)(EVAL_EXP* ptr, float value) = reinterpret_cast<void (*)(EVAL_EXP*, float)>(0x406fa0);
-static int (* const EvalExpressionI)(PLAYER*  p, EVAL_EXP* ptr, int warnNo) = reinterpret_cast<int (*)(PLAYER*, EVAL_EXP*, int) > (0x4075e0);
-static float (* const EvalExpressionF)(PLAYER* p, EVAL_EXP* ptr) = reinterpret_cast<float (*)(PLAYER * , EVAL_EXP*)>(0x4076d0);
+auto SCtrlParseElemType = reinterpret_cast<bool (*)(TPFILE* tpf, STATE_INFO* sinfo, PLAYER_CACHE* pcache)>(0x46aa60);
+auto SCtrlRCElemFree = reinterpret_cast<void (*)(STATE_INFO* sinfo)>(0x4718d0);
+auto ConstExpI = reinterpret_cast<void (*)(EVAL_EXP* ptr, int value)>(0x406f20);
+auto ConstExpF = reinterpret_cast<void (*)(EVAL_EXP* ptr, float value)>(0x406fa0);
+auto EvalExpressionI = reinterpret_cast<int (*)(PLAYER* p, EVAL_EXP* ptr, int warnNo) > (0x4075e0);
+auto EvalExpressionF = reinterpret_cast<float (*)(PLAYER* p, EVAL_EXP* ptr)>(0x4076d0);
 
 int findTargetStateByName(string);
 int regModState(int);
