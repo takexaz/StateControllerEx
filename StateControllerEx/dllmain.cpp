@@ -94,10 +94,8 @@ int regModState(int RETVALUE) {
         // エラー削除
         mugen_error[0] = '\x0';
 
-        auto reg = reinterpret_cast<void (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(gStateList[index]->regFunc);
-        reg(tpf, sinfo, pcache);
-
-        return TRUE;
+        auto reg = reinterpret_cast<int (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(gStateList[index]->regFunc);
+        return reg(tpf, sinfo, pcache);
     }
     else {
         return RETVALUE;
