@@ -396,5 +396,3 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-/StateControllerEx/dllmain.cpp
-/StateControllerEx/dllmain.cpp
