@@ -51,7 +51,7 @@ void setErrorText(const char* error) {
 
 void setErrorText(const char* state, const char* error) {
     char* mugen_error = (char*)*((DWORD*)0x4b5b4c) + 0xC534;
-    snprintf(mugen_error, 1023, "%s:%s", state, error);
+    snprintf(mugen_error, 1023, "%s: %s", state, error);
     return;
 }
 
