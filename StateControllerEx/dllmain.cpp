@@ -48,7 +48,6 @@ int GetQuotedString(TPFILE* tpf, const char* label, const char* dest, size_t siz
     return GetQuotedStringWrap(tpf, label, dest, size - 1, 0);
 }
 
-
 void setErrorText(const char* error) {
     char* mugen_error = (char*)*((DWORD*)0x4b5b4c) + 0xC534;
     snprintf(mugen_error, 1023, "%s", error);
