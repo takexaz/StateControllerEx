@@ -43,9 +43,15 @@ float EvalExpression(PLAYER* p, EVAL_EXP* ptr) {
     return EvalExpressionF(p,ptr);
 }
 
-void setErrorText(const char* str) {
+void setErrorText(const char* error) {
     char* mugen_error = (char*)*((DWORD*)0x4b5b4c) + 0xC534;
-    snprintf(mugen_error, 1023, "%s", str);
+    snprintf(mugen_error, 1023, "%s", error);
+    return;
+}
+
+void setErrorText(const char* state, const char* error) {
+    char* mugen_error = (char*)*((DWORD*)0x4b5b4c) + 0xC534;
+    snprintf(mugen_error, 1023, "%s:%s", state, error);
     return;
 }
 
