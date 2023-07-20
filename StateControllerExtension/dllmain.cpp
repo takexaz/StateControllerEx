@@ -49,12 +49,6 @@ void setErrorText(const char* error) {
     return;
 }
 
-void setErrorText(const char* state, const char* error) {
-    char* mugen_error = (char*)*((DWORD*)0x4b5b4c) + 0xC534;
-    snprintf(mugen_error, 1023, "%s: %s", state, error);
-    return;
-}
-
 // 本処理
 int findTargetStateByName(string type) {
     for (size_t i = 0; i < gStateList.size(); i++) {
