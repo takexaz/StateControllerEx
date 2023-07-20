@@ -43,6 +43,11 @@ float EvalExpression(PLAYER* p, EVAL_EXP* ptr) {
     return EvalExpressionF(p,ptr);
 }
 
+void setErrorText(const char* str) {
+    char* mugen_error = (char*)*((DWORD*)0x4b5b4c) + 0xC534;
+    snprintf(mugen_error, 1023, "%s", str);
+    return;
+}
 
 // 本処理
 int findTargetStateByName(string statename) {
