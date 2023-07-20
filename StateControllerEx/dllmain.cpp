@@ -158,13 +158,13 @@ BOOL APIENTRY DllMain( HMODULE hModule,
         // ステート開放フック
         Hook((DWORD)SCtrlRCElemFree, (DWORD)freeModState, HEAD);
 
-        LoadAllDLL("mods", ".stc");
+        LoadAllDLL("mods", ".stx");
         break;
     }
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
     case DLL_PROCESS_DETACH: {
-        FreeAllDLL("mods", ".stc");
+        FreeAllDLL("mods", ".stx");
         break;
     }
     }
