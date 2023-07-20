@@ -44,9 +44,8 @@ float EvalExpression(PLAYER* p, EVAL_EXP* ptr) {
 }
 
 int GetQuotedString(TPFILE* tpf, const char* label, const char* dest, size_t size) {
-    ZeroMemory((void*)dest, size);
     auto GetQuotedStringWrap = reinterpret_cast<int (*)(TPFILE * wtpf, const char* wlabel, const char* wdest, int wsize, int zero)>(0x415df0);
-    return GetQuotedStringWrap(tpf, label, dest, size, 0);
+    return GetQuotedStringWrap(tpf, label, dest, size - 1, 0);
 }
 
 
