@@ -15,7 +15,7 @@ int regModState(int);
 int procModState(void);
 void freeModState(void);
 
-vector<STX*> gStateList;
+vector<STX> gStateList;
 DWORD STATEID = 0x7FFFFFFF;
 
 // 補助関数
@@ -57,15 +57,15 @@ void setErrorText(const char* state, const char* error) {
 // 本処理
 int findTargetStateByName(string type) {
     for (size_t i = 0; i < gStateList.size(); i++) {
-        if (gStateList[i]->type == type) {
+        if (gStateList[i].type == type) {
             return static_cast<int>(i);
         }
     }
     return HOOK_NOT_FOUND;
 }
 
-void addState(STX* stx) {
-    if (findTargetStateByName(stx->type) == -1) {
+void addState(STX stx) {
+    if (findTargetStateByName(stx.type) == -1) {
         gStateList.push_back(stx);
     }
     return;
@@ -81,7 +81,7 @@ int regModState(int RETVALUE) {
         DWORD* stack;
         _asm {
             MOV stack, EBP
-            ADD stack, 0x2C
+            ADD stack, 0x30
         }
         TPFILE* tpf = (TPFILE*)*(stack);
         STATE_INFO* sinfo = (STATE_INFO*)*(stack + 1);
@@ -99,7 +99,7 @@ int regModState(int RETVALUE) {
         // エラー削除
         mugen_error[0] = '\x0';
 
-        auto reg = reinterpret_cast<int (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(gStateList[index]->reg);
+        auto reg = reinterpret_cast<int (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(gStateList[index].reg);
         return reg(tpf, sinfo, pcache);
     }
     else {
@@ -117,7 +117,7 @@ int procModState(void) {
     STATE_INFO* sinfo = (STATE_INFO*)*(stack + 1);
 
     if (sinfo->stateid != STATEID) return TRUE;
-    auto proc = reinterpret_cast<int (*)(PLAYER * , STATE_INFO*)>(gStateList[sinfo->substateid]->proc);
+    auto proc = reinterpret_cast<int (*)(PLAYER * , STATE_INFO*)>(gStateList[sinfo->substateid].proc);
     proc(p, sinfo);
     return FALSE;
 }
@@ -132,7 +132,7 @@ void freeModState(void) {
     STATE_INFO* sinfo = (STATE_INFO*)*(stack);
 
     if (sinfo->stateid != STATEID) return;
-    auto free = reinterpret_cast<int (*)(STATE_INFO*)>(gStateList[sinfo->substateid]->free);
+    auto free = reinterpret_cast<int (*)(STATE_INFO*)>(gStateList[sinfo->substateid].free);
     free(sinfo);
 
     return;
