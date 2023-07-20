@@ -2,6 +2,7 @@
 #include "pch.h"
 #include <Mebius.h>
 #include <StateControllerExtension.h>
+#pragma comment(lib, "Mebius.lib")
 
 auto SCtrlParseElemType = reinterpret_cast<bool (*)(TPFILE* tpf, STATE_INFO* sinfo, PLAYER_CACHE* pcache)>(0x46aa60);
 auto SCtrlRCElemFree = reinterpret_cast<void (*)(STATE_INFO* sinfo)>(0x4718d0);
