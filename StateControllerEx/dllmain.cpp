@@ -15,13 +15,7 @@ int regModState(int);
 int procModState(void);
 void freeModState(void);
 
-struct STATE {
-    string statename = "";
-    DWORD regFunc = -1;
-    DWORD procFunc = -1;
-    DWORD freeFunc = -1;
-};
-vector<STATE*> gStateList;
+vector<STX*> gStateList;
 DWORD STATEID = 0x7FFFFFFF;
 
 // 補助関数
@@ -61,23 +55,18 @@ void setErrorText(const char* state, const char* error) {
 }
 
 // 本処理
-int findTargetStateByName(string statename) {
+int findTargetStateByName(string type) {
     for (size_t i = 0; i < gStateList.size(); i++) {
-        if (gStateList[i]->statename == statename) {
+        if (gStateList[i]->type == type) {
             return static_cast<int>(i);
         }
     }
     return HOOK_NOT_FOUND;
 }
 
-void addState(string statename, DWORD regFunc, DWORD procFunc, DWORD freeFunc) {
-    if (findTargetStateByName(statename) == -1) {
-        STATE* s = new STATE;
-        s->statename = statename;
-        s->regFunc = regFunc;
-        s->procFunc = procFunc;
-        s->freeFunc = freeFunc;
-        gStateList.push_back(s);
+void addState(STX* stx) {
+    if (findTargetStateByName(stx->type) == -1) {
+        gStateList.push_back(stx);
     }
     return;
 }
@@ -110,7 +99,7 @@ int regModState(int RETVALUE) {
         // エラー削除
         mugen_error[0] = '\x0';
 
-        auto reg = reinterpret_cast<int (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(gStateList[index]->regFunc);
+        auto reg = reinterpret_cast<int (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(gStateList[index]->reg);
         return reg(tpf, sinfo, pcache);
     }
     else {
@@ -128,7 +117,7 @@ int procModState(void) {
     STATE_INFO* sinfo = (STATE_INFO*)*(stack + 1);
 
     if (sinfo->stateid != STATEID) return TRUE;
-    auto proc = reinterpret_cast<int (*)(PLAYER * , STATE_INFO*)>(gStateList[sinfo->substateid]->procFunc);
+    auto proc = reinterpret_cast<int (*)(PLAYER * , STATE_INFO*)>(gStateList[sinfo->substateid]->proc);
     proc(p, sinfo);
     return FALSE;
 }
@@ -143,7 +132,7 @@ void freeModState(void) {
     STATE_INFO* sinfo = (STATE_INFO*)*(stack);
 
     if (sinfo->stateid != STATEID) return;
-    auto free = reinterpret_cast<int (*)(STATE_INFO*)>(gStateList[sinfo->substateid]->freeFunc);
+    auto free = reinterpret_cast<int (*)(STATE_INFO*)>(gStateList[sinfo->substateid]->free);
     free(sinfo);
 
     return;
@@ -159,20 +148,20 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     {
     case DLL_PROCESS_ATTACH: {
         // ステート登録フック
-        Hook((DWORD)SCtrlParseElemType, (DWORD)regModState, TAIL);
+        Hook(SCtrlParseElemType, regModState, TAIL);
 
         // ステート処理埋め込み
-        writeGotoOpcode((DWORD)0x471554, (DWORD)procModState, CALL);
+        writeGotoOpcode((void*)0x471554, procModState, CALL);
         BYTE proc[37] = {
             0x85,0xC0,0x74,0x25,0x68,0x78,0xC3,0x4A,
             0x00,0xA1,0x4C,0x5B,0x4B,0x00,0x05,0x34,
             0xC5,0x00,0x00,0x50,0xE8,0xE5,0x0C,0x02,
             0x00,0x83,0xC4,0x08,0xE8,0xE6,0x42,0xFA,
             0xFF,0x90,0x90,0x90,0x90 };
-        writeBytesToROM((DWORD)0x471559, proc, sizeof(proc));
+        writeBytesToROM((void*)0x471559, proc, sizeof(proc));
 
         // ステート開放フック
-        Hook((DWORD)SCtrlRCElemFree, (DWORD)freeModState, HEAD);
+        Hook(SCtrlRCElemFree, freeModState, HEAD);
 
         LoadAllDLL("mods", ".stx");
         break;
