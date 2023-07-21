@@ -3,7 +3,8 @@
 #include "StateControllerExtension.h"
 using namespace std;
 
-static DWORD STATEID = 0x7FFFFFFF;
+extern vector<STX> gStateList;
+static int STATEID = 0x7FFFFFFF;
 
 static auto SCtrlParseElemType = reinterpret_cast<bool (*)(TPFILE* tpf, STATE_INFO* sinfo, PLAYER_CACHE* pcache)>(0x46aa60);
 static auto SCtrlRCElemFree = reinterpret_cast<void (*)(STATE_INFO* sinfo)>(0x4718d0);

@@ -17,8 +17,8 @@ struct COORD3D {
 
 struct TRIGGER_CONTROL {
     DWORD unkown1;
-    int numBytes;//ƒgƒŠƒK[‚Í‰½Byte‹æØ‚è‚©
-    int count01;//ƒgƒŠƒK[‘”
+    int numBytes;//ãƒˆãƒªã‚¬ãƒ¼ã¯ä½•ByteåŒºåˆ‡ã‚Šã‹
+    int count01;//ãƒˆãƒªã‚¬ãƒ¼ç·æ•°
     int count02;
     int count03;
     void* info;
@@ -27,7 +27,7 @@ struct TRIGGER_CONTROL {
 
 struct STATE_INFO {
     TRIGGER_CONTROL* trg;
-    int trgX;//triggerXÅ‘å
+    int trgX;//triggerXæœ€å¤§
     int persistent;
     int ignoregitpause;
     int stateid;
