@@ -32,6 +32,10 @@ void setErrorText(const char* error) {
     return;
 }
 
+int clamp(int value, int minimum, int maximum) {
+    return min(max(minimum, value), maximum);
+}
+
 // 本処理
 int findTargetStateByName(string type) {
     for (size_t i = 0; i < gStateList.size(); i++) {

@@ -108,6 +108,7 @@ static auto VWarn = reinterpret_cast<void (*)(PLAYER * p, const char* format, ..
 CLASS_DECLSPECEC void addState(STX stx);
 CLASS_DECLSPECEC void setErrorText(const char* error);
 CLASS_DECLSPECEC int GetQuotedString(TPFILE* tpf, const char* label, const char* dest, size_t size); // if ERROR return 0
+CLASS_DECLSPECEC int clamp(int value, int minimum, int maximum);
 CLASS_DECLSPEC void constExp(EVAL_EXP* ptr, int value);
 CLASS_DECLSPEC void constExp(EVAL_EXP* ptr, float value);
 CLASS_DECLSPEC int EvalExpression(PLAYER* p, EVAL_EXP* ptr, int warnNo);
