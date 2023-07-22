@@ -9,7 +9,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
         Hook(SCtrlParseElemType, regModState, TAIL);
 
         // ステート処理埋め込み
-        writeGotoOpcode((void*)0x471554, procModState, CALL);
+        writeCallOpcode((void*)0x471554, procModState);
         BYTE proc[37] = {
             0x85,0xC0,0x74,0x25,0x68,0x78,0xC3,0x4A,
             0x00,0xA1,0x4C,0x5B,0x4B,0x00,0x05,0x34,
