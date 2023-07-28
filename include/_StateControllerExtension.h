@@ -14,6 +14,6 @@ static auto EvalExpressionI = reinterpret_cast<int (*)(PLAYER* p, EVAL_EXP* ptr,
 static auto EvalExpressionF = reinterpret_cast<float (*)(PLAYER* p, EVAL_EXP* ptr)>(0x4076d0);
 
 int findTargetStateByName(string);
-int regModState(int);
+int regModState(void**, int);
 int procModState(void);
-void freeModState(void);
+void freeModState(void**);

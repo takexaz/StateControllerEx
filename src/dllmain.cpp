@@ -6,7 +6,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     {
     case DLL_PROCESS_ATTACH: {
         // ステート登録フック
-        Hook(SCtrlParseElemType, regModState, TAIL);
+        Hook(SCtrlParseElemType, regModState);
 
         // ステート処理埋め込み
         writeCallOpcode((void*)0x471554, procModState);
@@ -19,7 +19,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
         writeBytesToROM((void*)0x471559, proc, sizeof(proc));
 
         // ステート開放フック
-        Hook(SCtrlRCElemFree, freeModState, HEAD);
+        Hook(SCtrlRCElemFree, freeModState);
         LoadAllDLL("mods", ".stx");
         break;
     }
