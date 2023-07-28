@@ -77,6 +77,12 @@ struct PLAYER {
     int undef07, undef08, undef09;
 };
 
+enum EVAL_TYPE {
+    EVAL_NONE,
+    EVAL_INT,
+    EVAL_FLOAT
+};
+
 struct EVAL_EXP {
     void* ptr1 = 0;
     void* ptr2 = 0;
@@ -113,3 +119,4 @@ CLASS_DECLSPEC void constExp(EVAL_EXP* ptr, int value);
 CLASS_DECLSPEC void constExp(EVAL_EXP* ptr, float value);
 CLASS_DECLSPEC int EvalExpression(PLAYER* p, EVAL_EXP* ptr, int warnNo);
 CLASS_DECLSPEC float EvalExpression(PLAYER* p, EVAL_EXP* ptr);
+CLASS_DECLSPEC EVAL_TYPE EvalExpression(PLAYER* p, EVAL_EXP* ptr, int* pInt, float* pFloat);
