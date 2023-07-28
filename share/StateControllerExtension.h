@@ -83,6 +83,37 @@ enum EVAL_TYPE {
     EVAL_FLOAT
 };
 
+enum S_FLAG_TYPE {
+    S_GLOBAL,
+    S_PLAYER
+};
+
+enum S_GLOBAL_FLAG {
+    INTRO,
+    ROUNDNOTOVER,
+    NOKO,
+    NOKOSND,
+    NOKOSLOW,
+    NOMUSIC,
+    GLOBALNOSHADOW,
+    TIMERFREEZE,
+    NOBARDISPLAY,
+    NOBG,
+    NOFG
+};
+
+enum S_PLAYER_FLAG {
+    NOSTANDGUARD,
+    NOCROUCHGUARD,
+    NOAIRGUARD,
+    NOAUTOTURN,
+    NOSHADOW,
+    NOJUGGLECHECK,
+    NOWALK,
+    UNGUARDABLE,
+    INVISIBLE
+};
+
 struct EVAL_EXP {
     void* ptr1 = 0;
     void* ptr2 = 0;
@@ -96,9 +127,12 @@ struct STX {
     void (*free)(STATE_INFO*) = NULL;
 };
 
-static auto TPGetValue = reinterpret_cast<const char* (*)(TPFILE* tpf, const char* label)>(0x483b30);
+static auto TPGetValue = reinterpret_cast<const char* (*)(TPFILE * tpf, const char* label)>(0x483b30);
+static auto TPAccessFirstLine = reinterpret_cast<const char* (*)(TPFILE * tpf)>(0x483f10);
+static auto TPAccessNextLine = reinterpret_cast<const char* (*)(TPFILE * tpf)>(0x483f90);
 static auto SCtrlReadExpList = reinterpret_cast<int (*)(const char* value, const char* format, PLAYER_CACHE* pcache, DWORD* TEMP, ...)>(0x47d780);
-static auto ParsePosType = reinterpret_cast<int (*)(const char* postype)>(0x47db40);
+static auto ParsePosType = reinterpret_cast<int (*)(const char* postypeStr)>(0x47db40);
+static auto ParseSpecialFlag = reinterpret_cast<int (*)(const char* flagStr, int* flagType, int* flagNo)> (0x46aa60);
 static auto FreeExpression = reinterpret_cast<void (*)(EVAL_EXP* ptr)>(0x406e00);
 static auto Warn = reinterpret_cast<void (*)(PLAYER* p, const char *str)>(0x4155f0);
 static auto VWarn = reinterpret_cast<void (*)(PLAYER * p, const char* format, ...)>(0x415630);
