@@ -28,15 +28,13 @@ int regModState(void** stack, int RETVALUE) {
         mugen_error[0] = '\x0';
 
         auto reg = reinterpret_cast<int (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(gStateList[index].reg);
+        RETVALUE = reg(tpf, sinfo, pcache);
 
         // ID登録
         sinfo->stateid = STATEID;
         sinfo->substateid = index;
-        return reg(tpf, sinfo, pcache);
     }
-    else {
-        return RETVALUE;
-    }
+    return RETVALUE;
 }
 
 int procModState(void) {
