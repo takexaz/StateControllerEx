@@ -32,7 +32,7 @@ int regModState(void** stack, int RETVALUE) {
 
         // ID登録
         sinfo->stateid = STATEID;
-        sinfo->substateid = index;
+        sinfo->exstateid = index;
     }
     return RETVALUE;
 }
@@ -47,7 +47,7 @@ int procModState(void) {
     STATE_INFO* sinfo = (STATE_INFO*)*(stack + 1);
 
     if (sinfo->stateid != STATEID) return TRUE;
-    auto proc = reinterpret_cast<int (*)(PLAYER*, STATE_INFO*)>(gStateList[sinfo->substateid].proc);
+    auto proc = reinterpret_cast<int (*)(PLAYER*, STATE_INFO*)>(gStateList[sinfo->exstateid].proc);
     proc(p, sinfo);
     return FALSE;
 }
@@ -56,7 +56,7 @@ void freeModState(void** stack) {
     STATE_INFO* sinfo = (STATE_INFO*)*(stack);
 
     if (sinfo->stateid != STATEID) return;
-    auto free = reinterpret_cast<int (*)(STATE_INFO*)>(gStateList[sinfo->substateid].free);
+    auto free = reinterpret_cast<int (*)(STATE_INFO*)>(gStateList[sinfo->exstateid].free);
     free(sinfo);
 
     return;

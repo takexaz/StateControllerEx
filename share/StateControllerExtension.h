@@ -31,7 +31,7 @@ struct STATE_INFO {
     int persistent;
     int ignoregitpause;
     int stateid;
-    int substateid;
+    int exstateid;
     void* params;
     void* type;
 };
