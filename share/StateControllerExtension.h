@@ -130,7 +130,7 @@ struct STX {
 static auto TPGetValue = reinterpret_cast<const char* (*)(TPFILE * tpf, const char* label)>(0x483b30);
 static auto TPAccessFirstLine = reinterpret_cast<const char* (*)(TPFILE * tpf)>(0x483f10);
 static auto TPAccessNextLine = reinterpret_cast<const char* (*)(TPFILE * tpf)>(0x483f90);
-static auto SCtrlReadExpList = reinterpret_cast<int (*)(const char* value, const char* format, PLAYER_CACHE* pcache, DWORD* TEMP, ...)>(0x47d780);
+static auto SCtrlReadExpList = reinterpret_cast<int (*)(const char* value, const char* format, PLAYER_CACHE* pcache, const char* parseEnd, ...)>(0x47d780);
 static auto ParsePosType = reinterpret_cast<int (*)(const char* postypeStr)>(0x47db40);
 static auto ParseSpecialFlag = reinterpret_cast<int (*)(const char* flagStr, int* flagType, int* flagNo)> (0x46aa60);
 static auto FreeExpression = reinterpret_cast<void (*)(EVAL_EXP* ptr)>(0x406e00);
