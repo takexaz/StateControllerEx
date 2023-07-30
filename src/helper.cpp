@@ -1,6 +1,7 @@
 #include "_StateControllerExtension.h"
 
 void addState(STX stx) {
+    transform(stx.type.begin(), stx.type.end(), stx.type.begin(), ::tolower);
     if (findTargetStateByName(stx.type) == -1) {
         gStateList.push_back(stx);
     }
@@ -23,13 +24,14 @@ int regModState(void** stack, int RETVALUE) {
         // 見つからなければエラー
         if (index == -1) return RETVALUE;
 
-        // ID登録
-        sinfo->stateid = STATEID;
-        sinfo->substateid = index;
         // エラー削除
         mugen_error[0] = '\x0';
 
         auto reg = reinterpret_cast<int (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(gStateList[index].reg);
+
+        // ID登録
+        sinfo->stateid = STATEID;
+        sinfo->substateid = index;
         return reg(tpf, sinfo, pcache);
     }
     else {
