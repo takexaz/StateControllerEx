@@ -15,8 +15,8 @@ int regModState(void** stack, int RETVALUE) {
     char* error = (char*)"Not a ";
     if (strncmp(mugen_error, error, 6) == 0) {
         TPFILE* tpf = (TPFILE*)*(stack);
-        STATE_INFO* sinfo = (STATE_INFO*)*(stack + 1);
-        PLAYER_CACHE* pcache = (PLAYER_CACHE*)*(stack + 2);
+        MUGEN_SC_DATA_EX* scdataEx = (MUGEN_SC_DATA_EX*)*(stack + 1);
+        MUGEN_PLAYER_INFO* pinfo = (MUGEN_PLAYER_INFO*)*(stack + 2);
 
         // ステコン名から番号取得
         string statename(mugen_error + 23);
@@ -26,13 +26,14 @@ int regModState(void** stack, int RETVALUE) {
 
         // エラー削除
         mugen_error[0] = '\x0';
+        scdataEx->SCX = new MEBIUS_SCX_DATA;
 
-        auto reg = reinterpret_cast<int (*)(TPFILE*, STATE_INFO*, PLAYER_CACHE*)>(gStateList[index].reg);
-        RETVALUE = reg(tpf, sinfo, pcache);
+        auto reg = reinterpret_cast<int (*)(TPFILE*, MUGEN_SC_DATA_EX*, MUGEN_PLAYER_INFO*)>(gStateList[index].reg);
+        RETVALUE = reg(tpf, scdataEx, pinfo);
 
         // ID登録
-        sinfo->stateid = STATEID;
-        sinfo->exstateid = index;
+        scdataEx->scID = (MUGEN_SC_ID)STATEID;
+        scdataEx->SCX->exscID = index;
     }
     return RETVALUE;
 }
@@ -43,21 +44,21 @@ int procModState(void) {
         MOV stack, EBP
         ADD stack, 0x10A8
     }
-    PLAYER* p = (PLAYER*)*(stack);
-    STATE_INFO* sinfo = (STATE_INFO*)*(stack + 1);
+    MUGEN_PLAYER* player = (MUGEN_PLAYER*)*(stack);
+    MUGEN_SC_DATA_EX* scdataEx = (MUGEN_SC_DATA_EX*)*(stack + 1);
 
-    if (sinfo->stateid != STATEID) return TRUE;
-    auto proc = reinterpret_cast<int (*)(PLAYER*, STATE_INFO*)>(gStateList[sinfo->exstateid].proc);
-    proc(p, sinfo);
+    if (scdataEx->scID != STATEID) return TRUE;
+    auto proc = reinterpret_cast<int (*)(MUGEN_PLAYER*, MUGEN_SC_DATA_EX*)>(gStateList[scdataEx->SCX->exscID].proc);
+    proc(player, scdataEx);
     return FALSE;
 }
 
 void freeModState(void** stack) {
-    STATE_INFO* sinfo = (STATE_INFO*)*(stack);
+    MUGEN_SC_DATA_EX* scdataEx = (MUGEN_SC_DATA_EX*)*(stack);
 
-    if (sinfo->stateid != STATEID) return;
-    auto free = reinterpret_cast<int (*)(STATE_INFO*)>(gStateList[sinfo->exstateid].free);
-    free(sinfo);
+    if (scdataEx->scID != STATEID) return;
+    auto free = reinterpret_cast<int (*)(MUGEN_SC_DATA_EX*)>(gStateList[scdataEx->SCX->exscID].free);
+    free(scdataEx);
 
     return;
 }

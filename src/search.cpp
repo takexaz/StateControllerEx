@@ -6,5 +6,5 @@ int findTargetStateByName(string type) {
             return static_cast<int>(i);
         }
     }
-    return HOOK_NOT_FOUND;
+    return -1;
 }
