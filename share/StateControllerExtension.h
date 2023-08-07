@@ -6,7 +6,7 @@ using namespace std;
 
 
 struct STX {
-    string type = "";
+    string scName = "";
     int (*reg)(TPFILE* tpf, MUGEN_SC_DATA_EX* scdx, MUGEN_PLAYER_INFO* pinfp) = NULL;
     void (*proc)(MUGEN_PLAYER* player, MUGEN_SC_DATA_EX* scdx) = NULL;
     void (*free)(MUGEN_SC_DATA_EX* scdx) = NULL;

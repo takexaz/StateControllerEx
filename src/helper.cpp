@@ -1,8 +1,8 @@
 #include "_StateControllerExtension.h"
 
 void addState(STX stx) {
-    transform(stx.type.begin(), stx.type.end(), stx.type.begin(), ::tolower);
-    if (findTargetStateByName(stx.type) == -1) {
+    transform(stx.scName.begin(), stx.scName.end(), stx.scName.begin(), ::tolower);
+    if (findTargetStateByName(stx.scName) == -1) {
         gStateList.push_back(stx);
     }
     return;
