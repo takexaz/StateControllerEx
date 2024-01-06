@@ -17,6 +17,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Mebius::Mebius)
 set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".mx")
 
 target_compile_features (${PROJECT_NAME} PRIVATE cxx_std_20)
+
 target_compile_definitions (
 	${PROJECT_NAME}
 	PRIVATE
@@ -125,3 +126,22 @@ install (
 	FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
 	DESTINATION cmake
 )
+
+# デバッグフォルダにコンパイルの産物をコピー
+set(DEBUG_DIR "${CMAKE_SOURCE_DIR}/../!MUGEN_DEBUG/mods/StateControllerExtension/")
+add_custom_command(
+	TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${DEBUG_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${PROJECT_NAME}>" ${DEBUG_DIR}
+)
+IF(CMAKE_BUILD_TYPE MATCHES Debug)
+add_custom_command(
+	TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_PDB_FILE:${PROJECT_NAME}>" ${DEBUG_DIR}
+)
+ELSE(CMAKE_BUILD_TYPE MATCHES Release)
+add_custom_command(
+	TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove -f "${DEBUG_DIR}/${PROJECT_NAME}.pdb"
+)
+ENDIF()

@@ -1,0 +1,14 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "dll",
+      "exe": "${workspaceRoot}\\..\\!MUGEN_DEBUG\\mugen.exe",
+      "currentDir": "${workspaceRoot}\\..\\!MUGEN_DEBUG",
+      "project": "CMakeLists.txt",
+      "projectTarget": "StateControllerExtension.dll",
+      "name": "StateControllerExtension.dll"
+    }
+  ]
+}
