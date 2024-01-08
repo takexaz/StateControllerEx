@@ -1,29 +1,35 @@
 #pragma once
-#include <special_type.hpp>
-#include <controller.hpp>
-#include <iostream>
+#include <stdio.h>
+#include <stdint.h>
 #include <wtypes.h>
 
-using namespace stx::state;
+namespace stx::state::processor {
+    class Processor;
+}
 
 namespace stx::mugen {
+	using undefined = BYTE;
+	using undefined4 = DWORD;
 
-    using undefined = BYTE;
-    using undefined4 = DWORD;
+	enum PARAM_TYPE {
+		INTEGER = 0,
+		FLOATING_POINT = 1,
+		OPERATOR = 2,
+		TRIGGER = 3,
+		UNDEFINED = 4,
+		NUMBER = 5,
+		QUOTED_STRING = 6,
+		RAW_STRING = 7,
+	};
+	struct EVAL_VALUE {
+		void* exprs = nullptr;
+		int* types = nullptr;
+		uint32_t value = NULL;
+	};
 
     struct TPFILE {
         void* unknown;
     };
-
-    struct SCX_DATA_EX {
-        void* triggers;
-        uint32_t triggerCnt;
-        int32_t persistent;
-        int32_t ignorehitpause;
-        int scID;
-        stx::state::Controller* ctrl;
-    };
-
     struct VERSION_DATA {
         int32_t month;
         int32_t day;
@@ -123,13 +129,34 @@ namespace stx::mugen {
         undefined4 _unknown_5[64];
     };
 
+    struct PLAYER {
+        PLAYER_INFO* info;
+    };
+
+    struct SCX_DATA_EX {
+        void* triggers;
+        uint32_t triggerCnt;
+        int32_t persistent;
+        int32_t ignorehitpause;
+        int scID;
+        stx::state::processor::Processor* proc;
+    };
+
     static void SetParseErrorText(const char* error) {
         char* mugen_error = (char*)*((DWORD*)0x4b5b4c) + 0xC534;
         snprintf(mugen_error, 1023, "%s", error);
         return;
     }
 
-    static int STATEID = 0x7FFFFFFF;
-    static auto TPGetValue = reinterpret_cast<const char* (*)(TPFILE * tpf, const char* label)>(0x483b30);
+    static auto TPGetValue = reinterpret_cast<char* (*)(TPFILE * tpf, const char* label)>(0x483b30);
+    static auto SCtrlReadExpList = reinterpret_cast<int (*)(char* value, const char* format, PLAYER_INFO * playerInfo, char** parseEnd, ...)>(0x47d780);
+    static auto ConstExpI = reinterpret_cast<void (*)(EVAL_VALUE * eval, int value)>(0x406f20);
+    static auto ConstExpF = reinterpret_cast<void (*)(EVAL_VALUE * eval, float value)>(0x406fa0);
+    static auto EvalExpression = reinterpret_cast<PARAM_TYPE(*)(PLAYER * player, EVAL_VALUE * eval, int* pInt, float* pFloat)>(0x407780);
+    static auto EvalExpressionI = reinterpret_cast<int(*)(PLAYER * player, EVAL_VALUE * eval, int warnNo)>(0x4075e0);
+    static auto EvalExpressionF = reinterpret_cast<float(*)(PLAYER * player, EVAL_VALUE * eval)>(0x4076d0);
+
+    static auto FreeExpression = reinterpret_cast<void (*)(EVAL_VALUE * eval)>(0x406e00);
+
     static auto SCtrlParseElemType = reinterpret_cast<BOOL(*)(TPFILE * tpf, SCX_DATA_EX * sinfo, PLAYER_INFO * playerInfo)>(0x46aa60);
 }

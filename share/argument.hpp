@@ -1,5 +1,6 @@
 #pragma once
 #include <special_type.hpp>
+#include <mugen.hpp>
 
 #ifdef STCEX_EXPORT
 #define STCEXAPI __declspec(dllexport)
@@ -8,42 +9,29 @@
 #endif
 
 using namespace stx::state;
+using namespace stx::mugen;
 
-namespace stx::state {
-
-	class Argument_impl {
+namespace stx::state::argument {
+	class Argument {
 	protected:
 		std::string _name;
-		bool _require;
 		PARAM_TYPE _type;
-		eval _eval = {};
-		std::variant<int, float, std::string> _value = nullptr;
+		bool _required;
 	public:
-		virtual ~Argument_impl() {}
-		std::string get_name(void) {
-			return this->_name;
-		}
-		bool get_require(void) {
-			return this->_require;
-		}
-		PARAM_TYPE get_type(void) {
-			return this->_type;
-		}
-		eval get_eval(void) {
-			return this->_eval;
-		}
-		std::variant<int, float, std::string> get_value(void) {
-			return this->_value;
-		}
+		virtual ~Argument() {}
+		Argument(std::string name, bool required);
+		std::string get_name(void);
+		bool is_required(void);
+		PARAM_TYPE get_type(void);
 	};
 
 	template <exp_t T>
-	class STCEXAPI Argument : public Argument_impl {
+	class STCEXAPI Argument_Optional : public Argument {
+	private:
+		std::variant<int, float, std::string> _value;
 	public:
-		Argument(std::string name, T value) {
-			std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-			this->_name = name;
-			this->_require = false;
+		Argument_Optional(std::string name, T value) : Argument{ std::move(name), false } {
+			bool _required = false;
 			if constexpr (std::is_same_v<T, number>) {
 				this->_type = NUMBER;
 				if (std::holds_alternative<int>(value)) {
@@ -61,7 +49,7 @@ namespace stx::state {
 				this->_type = FLOATING_POINT;
 				_value = value;
 			}
-			else if constexpr (std::is_same_v<T, quoted_str>) {
+			else if constexpr (std::is_same_v<T, QuotedString>) {
 				this->_type = QUOTED_STRING;
 				_value = value.str;
 			}
@@ -70,15 +58,16 @@ namespace stx::state {
 				_value = value.str;
 			}
 		}
+		std::variant<int, float, std::string> get_value(void) {
+			return this->_value;
+		}
 	};
 
 	template <exp_t T>
-	class STCEXAPI Argument_Require : public Argument_impl {
+	class STCEXAPI Argument_Required : public Argument {
 	public:
-		Argument_Require(std::string name) {
-			std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-			this->_name = name;
-			this->_require = true;
+		Argument_Required(std::string name) : Argument{ std::move(name), true } {
+			bool _required = true;
 			if constexpr (std::is_same_v<T, number>) {
 				this->_type = NUMBER;
 			}
@@ -88,12 +77,13 @@ namespace stx::state {
 			else if constexpr (std::is_same_v<T, float>) {
 				this->_type = FLOATING_POINT;
 			}
-			else if constexpr (std::is_same_v<T, quoted_str>) {
+			else if constexpr (std::is_same_v<T, QuotedString>) {
 				this->_type = QUOTED_STRING;
 			}
 			else {
 				this->_type = RAW_STRING;
 			}
+
 		}
 	};
 }

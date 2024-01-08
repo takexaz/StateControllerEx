@@ -1,35 +1,36 @@
 #pragma once
 #include <iostream>
-#include <algorithm>
-#include <vector>
 #include <variant>
+#include <unordered_map>
+
+namespace stx::mugen {
+	enum PARAM_TYPE;
+	struct EVAL_VALUE;
+}
+
+namespace stx::state::processor {
+	class Processor;
+}
 
 namespace stx::state {
-	enum PARAM_TYPE {
-		NUMBER,
-		INTEGER,
-		FLOATING_POINT,
-		QUOTED_STRING,
-		RAW_STRING
-	};
-	struct EVAL_VALUE {
-		void* exprs = nullptr;
-		int* types = nullptr;
-		uint32_t value;
-	};
-
-	using eval = std::variant<std::string, EVAL_VALUE>;
+	using eval = std::variant<std::string, stx::mugen::EVAL_VALUE>;
 	using number = std::variant<int, float>;
 
-	struct raw_str {
+	using arg_t = std::pair<stx::mugen::PARAM_TYPE, eval>;
+	using args_t = std::unordered_map <std::string, arg_t*>;
+	using param_t = std::pair<args_t*, args_t*>;
+	using params_t = std::unordered_map <std::string, param_t*>;
+	using proc_t = bool(*)(stx::state::processor::Processor*);
+
+	struct RawString {
 		std::string str;
-		raw_str(const char* str) : str(str) {}
+		RawString(const char* str) : str(str) {}
 	};
-	struct quoted_str {
+	struct QuotedString {
 		std::string str;
-		quoted_str(const char* str) : str(str) {}
+		QuotedString(const char* str) : str(str) {}
 	};
 
 	template <typename T>
-	concept exp_t = std::same_as<T, number> || std::same_as<T, int> || std::same_as <T, float> || std::same_as<T, raw_str> || std::same_as<T, quoted_str>;
+	concept exp_t = std::same_as<T, number> || std::same_as<T, int> || std::same_as <T, float> || std::same_as<T, RawString> || std::same_as<T, QuotedString>;
 }
