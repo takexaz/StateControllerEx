@@ -8,6 +8,12 @@ namespace stx::state::parameter {
 		for (auto arg : args) {
 			auto name = arg->get_name();
 			if (arg->is_required()) {
+				for (auto& pair : _args_opt) {
+					if (pair.first == name) {
+						//stx::error::ShowErrorDialog("Error in Controller: Parameters are the same name.");
+						return;
+					}
+				}
 				for (auto& pair : _args_req) {
 					if (pair.first == name) {
 						pair.second = arg;
@@ -17,6 +23,12 @@ namespace stx::state::parameter {
 				_args_req.push_back(std::pair<std::string, Argument*>(name, arg));
 			}
 			else {
+				for (auto& pair : _args_req) {
+					if (pair.first == name) {
+						//stx::error::ShowErrorDialog("Error in Controller: Parameters are the same name.");
+						return;
+					}
+				}
 				for (auto& pair : _args_opt) {
 					if (pair.first == name) {
 						pair.second = arg;

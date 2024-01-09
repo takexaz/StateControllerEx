@@ -8,24 +8,29 @@ namespace stx::state::processor {
 }
 
 namespace stx::mugen {
-	using undefined = BYTE;
-	using undefined4 = DWORD;
+    using undefined = BYTE;
+    using undefined4 = DWORD;
 
-	enum PARAM_TYPE {
-		INTEGER = 0,
-		FLOATING_POINT = 1,
-		OPERATOR = 2,
-		TRIGGER = 3,
-		UNDEFINED = 4,
-		NUMBER = 5,
-		QUOTED_STRING = 6,
-		RAW_STRING = 7,
-	};
-	struct EVAL_VALUE {
-		void* exprs = nullptr;
-		int* types = nullptr;
-		uint32_t value = NULL;
-	};
+    enum PARAM_TYPE {
+        INTEGER = 0,
+        FLOATING_POINT,
+        NUMBER,
+        QUOTED_STRING,
+        RAW_STRING,
+        UNDEFINED,
+    };
+
+    enum NUMBER_TYPE {
+        N_ERROR = 0,
+        N_INT,
+        N_FLOAT
+    };
+
+    struct EVAL_VALUE {
+        void* exprs = nullptr;
+        int* types = nullptr;
+        uint32_t value = NULL;
+    };
 
     struct TPFILE {
         void* unknown;
@@ -133,7 +138,15 @@ namespace stx::mugen {
         PLAYER_INFO* info;
     };
 
-    struct SCX_DATA_EX {
+    struct PLAYER_REDIRECTS {
+        PLAYER* enemyFirst;
+        PLAYER* teamFirst;
+        PLAYER* partner;
+        PLAYER* parent;
+        PLAYER* root;
+    };
+
+    struct SC_DATA_EX {
         void* triggers;
         uint32_t triggerCnt;
         int32_t persistent;
@@ -152,11 +165,12 @@ namespace stx::mugen {
     static auto SCtrlReadExpList = reinterpret_cast<int (*)(char* value, const char* format, PLAYER_INFO * playerInfo, char** parseEnd, ...)>(0x47d780);
     static auto ConstExpI = reinterpret_cast<void (*)(EVAL_VALUE * eval, int value)>(0x406f20);
     static auto ConstExpF = reinterpret_cast<void (*)(EVAL_VALUE * eval, float value)>(0x406fa0);
-    static auto EvalExpression = reinterpret_cast<PARAM_TYPE(*)(PLAYER * player, EVAL_VALUE * eval, int* pInt, float* pFloat)>(0x407780);
-    static auto EvalExpressionI = reinterpret_cast<int(*)(PLAYER * player, EVAL_VALUE * eval, int warnNo)>(0x4075e0);
+    static auto EvalExpression = reinterpret_cast<NUMBER_TYPE(*)(PLAYER * player, EVAL_VALUE * eval, int* pInt, float* pFloat)>(0x407780);
+    static auto EvalExpressionI = reinterpret_cast<int(*)(PLAYER * player, EVAL_VALUE * eval, BOOL nowarn)>(0x4075e0);
     static auto EvalExpressionF = reinterpret_cast<float(*)(PLAYER * player, EVAL_VALUE * eval)>(0x4076d0);
-
     static auto FreeExpression = reinterpret_cast<void (*)(EVAL_VALUE * eval)>(0x406e00);
+    static auto Warn = reinterpret_cast<void(*)(PLAYER * player, const char * error)>(0x4076d0);
 
-    static auto SCtrlParseElemType = reinterpret_cast<BOOL(*)(TPFILE * tpf, SCX_DATA_EX * sinfo, PLAYER_INFO * playerInfo)>(0x46aa60);
+    static auto SCtrlParseElemType = reinterpret_cast<BOOL(*)(TPFILE * tpf, SC_DATA_EX * sinfo, PLAYER_INFO * playerInfo)>(0x46aa60);
+    static auto PlayerSCtrlApplyElem = reinterpret_cast<BOOL(*)(PLAYER * player, SC_DATA_EX * sinfo, PLAYER_REDIRECTS * redirects)>(0x46e800);
 }

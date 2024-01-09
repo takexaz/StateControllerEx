@@ -18,61 +18,72 @@ namespace stx::state::processor {
 		params_t* _ps;
 		PLAYER* _player;
 		proc_t _proc;
+
+		param_t* get_parameter(std::string name);
+		arg_t* get_argument(param_t* p, std::string name);
 	public:
 		Processor(params_t* ps, proc_t proc);
 		void set_player(PLAYER* player);
 
-		param_t* get_parameter(std::string name);
-		arg_t* get_argument_required(param_t* p, std::string name);
-		arg_t* get_argument_optional(param_t* p, std::string name);
+		void warn(std::string str);
 
-		template<typename T>
-		T get_value(arg_t* a) {
-			switch (a->first)
+		proc_t get_proc(void);
+
+		template<typename T> T* get_value(std::string param_name, std::string arg_name);
+
+		template<> number* get_value(std::string param_name, std::string arg_name) {
+			auto value = get_argument(get_parameter(param_name), arg_name);
+			if (value == nullptr) return nullptr;
+
+			int i;
+			float f;
+			EVAL_VALUE e = std::get<EVAL_VALUE>(value->second);
+			number v;
+			switch (EvalExpression(_player, &e, &i, &f))
 			{
-			case NUMBER:
+			case N_INT:
 			{
-				int i = 0;
-				float f = 0.0f;
-				EVAL_VALUE e = std::get<EVAL_VALUE>(a->second);
+				v = i;
 				break;
 			}
-			case INTEGER:
+			case N_FLOAT:
 			{
-
-				break;
-			}
-			case FLOATING_POINT:
-			{
-
-				break;
-			}
-			case QUOTED_STRING:
-			{
-
-				break;
-			}
-			case RAW_STRING:
-			{
-
+				v = f;
 				break;
 			}
 			default:
 			{
-				//ShowErrorDialog("Error in get_value: Unknown value type.");
+				// error
 				break;
 			}
 			}
+			return &v;
+		}
+
+		template<> int* get_value(std::string param_name, std::string arg_name) {
+			auto value = get_argument(get_parameter(param_name), arg_name);
+			if (value == nullptr) return nullptr;
+
+			EVAL_VALUE e = std::get<EVAL_VALUE>(value->second);
+			int v = EvalExpressionI(_player, &e, FALSE);
+			return &v;
+		}
+
+		template<> float* get_value(std::string param_name, std::string arg_name) {
+			auto value = get_argument(get_parameter(param_name), arg_name);
+			if (value == nullptr) return nullptr;
+
+			EVAL_VALUE e = std::get<EVAL_VALUE>(value->second);
+			float v = EvalExpressionF(_player, &e);
+			return &v;
+		}
+
+		template<> std::string* get_value(std::string param_name, std::string arg_name) {
+			auto value = get_argument(get_parameter(param_name), arg_name);
+			if (value == nullptr) return nullptr;
+
+			std::string v = std::get<std::string>(value->second);
+			return &v;
 		}
 	};
-
-	struct SCX_DATA_EX {
-		void* triggers;
-		uint32_t triggerCnt;
-		int32_t persistent;
-		int32_t ignorehitpause;
-		int scID;
-		Processor* proc;
-	};
-
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <mugen.hpp>
 #include <iostream>
 #include <variant>
 #include <unordered_map>
@@ -20,7 +21,7 @@ namespace stx::state {
 	using args_t = std::unordered_map <std::string, arg_t*>;
 	using param_t = std::pair<args_t*, args_t*>;
 	using params_t = std::unordered_map <std::string, param_t*>;
-	using proc_t = bool(*)(stx::state::processor::Processor*);
+	using proc_t = BOOL(*)(stx::state::processor::Processor*, stx::mugen::PLAYER* player, stx::mugen::PLAYER_REDIRECTS* redirects);
 
 	struct RawString {
 		std::string str;

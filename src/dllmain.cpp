@@ -9,7 +9,14 @@ using namespace stx::state::parameter;
 using namespace stx::state::controller;
 using namespace stx::state::processor;
 
-bool example_state(Processor* p) {
+BOOL set_round_timer(Processor* p, stx::mugen::PLAYER* player, stx::mugen::PLAYER_REDIRECTS* redirects) {
+    DWORD* roundtimer = (DWORD*)(*((DWORD*)0x4b5b4c) + 0xBC40);
+
+    int* i = p->get_value<int>("value", "time");
+    if (i != nullptr) {
+        *roundtimer = *i;
+    }
+
     return true;
 }
 
@@ -19,26 +26,17 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH: {
-        mebius::hook::HookOnTail(stx::mugen::SCtrlParseElemType, stx::hooking::regmodstate);
+        mebius::hook::HookOnTail(stx::mugen::SCtrlParseElemType, stx::hooking::reg::regmodstate);
+        mebius::inline_hook::HookInline(0x47154f, stx::hooking::proc::inhook_proc);
+        mebius::hook::HookOnTail(stx::mugen::PlayerSCtrlApplyElem, stx::hooking::proc::procmodstate);
 
-        // Type = Example
-        // params_v(îCà”) =  x(int/ïKê{), y(float/ïKê{), z(number/îCà”)
-        // params_s(ïKê{) =  b(quoted_string/îCà”), c(raw_string/îCà”)
+        // Type = SetRoundTimer
+        // time(ïKê{) =  v(int/ïKê{)
 
-        Controller::create(example_state, "example", {
-                    (new Parameter_Required("params_v", {
-                        new Argument_Optional<int>("x", 100),
-                        new Argument_Optional<float>("y", 200.0f),
-                        new Argument_Optional<number>("z", 300),
-                        new Argument_Optional<number>("z", 400.0f),
-                    }))->set_illegal_argument_error("illegal"),
-                    (new Parameter_Required("params_s", {
-                        new Argument_Optional<RawString>("b", "500"),
-                        new Argument_Optional<QuotedString>("a", "600"),
-                    }))
-                    ->set_illegal_argument_error("illegal")
-                    ->set_missing_error("missing")
-
+        Controller::create(set_round_timer, "setroundtimer", {
+                    (new Parameter_Required("value", {
+                        new Argument_Required<int>("time")
+                    })),
             });
         break;
     }

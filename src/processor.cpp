@@ -6,6 +6,15 @@ namespace stx::state::processor {
 		this->_player = player;
 	}
 
+	void Processor::warn(std::string str) {
+		stx::mugen::Warn(_player, str.c_str());
+	}
+
+	proc_t Processor::get_proc(void)
+	{
+		return this->_proc;
+	}
+
 	param_t* Processor::get_parameter(std::string name) {
 		if (this->_ps->count(name)) {
 			return _ps->at(name);
@@ -14,30 +23,20 @@ namespace stx::state::processor {
 			return nullptr;
 		}
 	}
-	arg_t* Processor::get_argument_required(param_t* p, std::string name) {
+	arg_t* Processor::get_argument(param_t* p, std::string name) {
 		if (p == nullptr) {
 			return nullptr;
 		}
-
-		args_t* a = p->first;
-		if (a->count(name)) {
-			return a->at(name);
+		if (p->first->count(name)) {
+			return p->first->at(name);
+		}
+		else if (p->second->count(name)) {
+			return p->second->at(name);
 		}
 		else {
+			// error
 			return nullptr;
 		}
 	}
-	arg_t* Processor::get_argument_optional(param_t* p, std::string name) {
-		if (p == nullptr) {
-			return nullptr;
-		}
 
-		args_t* a = p->second;
-		if (a->count(name)) {
-			return a->at(name);
-		}
-		else {
-			return nullptr;
-		}
-	}
 }
