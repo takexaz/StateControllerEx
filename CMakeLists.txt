@@ -22,8 +22,7 @@ target_compile_definitions (
 	${PROJECT_NAME}
 	PRIVATE
 	STCEX_EXPORT
-	WIN32
-	_WINDOWS
+	PLOG_IMPORT
 	UNICODE
 	_UNICODE
 	$<$<CONFIG:Debug>: 
@@ -40,7 +39,6 @@ target_compile_options (
 	PRIVATE
 	/W4
 	/arch:AVX
-	/EHsc
 	/fp:fast
 	/GS
 	/GT
@@ -50,23 +48,18 @@ target_compile_options (
 	/Qpar
 	/utf-8
 	$<$<CONFIG:Debug>:
-		/GR
 		/JMC
-		/MDd
+		/LDd
 		/Ob0
 		/Od
 		/RTC1
-		/ZI
 	>
 	$<$<CONFIG:Release>:
 		/GA
 		/GL
-		/GR-
 		/Gy
 		/guard:cf-
-		/MD
-		/O2
-		/Oi
+		/LD
 		/Os
 	>
 )

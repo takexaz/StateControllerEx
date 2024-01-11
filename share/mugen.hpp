@@ -173,4 +173,5 @@ namespace stx::mugen {
 
     static auto SCtrlParseElemType = reinterpret_cast<BOOL(*)(TPFILE * tpf, SC_DATA_EX * sinfo, PLAYER_INFO * playerInfo)>(0x46aa60);
     static auto PlayerSCtrlApplyElem = reinterpret_cast<BOOL(*)(PLAYER * player, SC_DATA_EX * sinfo, PLAYER_REDIRECTS * redirects)>(0x46e800);
+    static auto SCtrlRCElemFree = reinterpret_cast<void(*)(SC_DATA_EX * sinfo)>(0x4718d0);
 }

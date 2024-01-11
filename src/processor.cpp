@@ -2,6 +2,12 @@
 
 namespace stx::state::processor {
 	Processor::Processor(params_t* ps, proc_t proc) : _ps(ps), _proc(proc), _player(nullptr) {}
+
+	Processor::~Processor()
+	{
+		delete _ps;
+	}
+
 	void Processor::set_player(PLAYER* player) {
 		this->_player = player;
 	}

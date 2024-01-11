@@ -1,4 +1,5 @@
 #pragma once
+#include <Mebius.hpp>
 #include <special_type.hpp>
 #include <mugen.hpp>
 
@@ -31,6 +32,7 @@ namespace stx::state::argument {
 		std::variant<int, float, std::string> _value;
 	public:
 		Argument_Optional(std::string name, T value) : Argument{ std::move(name), false } {
+			PLOGD << "Argopt";
 			bool _required = false;
 			if constexpr (std::is_same_v<T, number>) {
 				this->_type = NUMBER;

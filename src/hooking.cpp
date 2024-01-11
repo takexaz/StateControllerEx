@@ -328,3 +328,13 @@ namespace stx::hooking::proc {
 		}
 	}
 }
+
+namespace stx::hooking::free {
+	void stx::hooking::free::freemodstate(SC_DATA_EX* sinfo) {
+		if (sinfo->scID != exSCID) return;
+
+		delete sinfo->proc;
+
+		return;
+	}
+}

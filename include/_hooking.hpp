@@ -13,3 +13,6 @@ namespace stx::hooking::proc {
 namespace stx::hooking::reg {
 	BOOL regmodstate(int32_t original_result, TPFILE* tpf, SC_DATA_EX* sinfo, PLAYER_INFO* playerInfo);
 }
+namespace stx::hooking::free {
+	void freemodstate(SC_DATA_EX* sinfo);
+}

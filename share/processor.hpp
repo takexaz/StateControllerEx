@@ -23,32 +23,32 @@ namespace stx::state::processor {
 		arg_t* get_argument(param_t* p, std::string name);
 	public:
 		Processor(params_t* ps, proc_t proc);
+		~Processor();
 		void set_player(PLAYER* player);
 
 		void warn(std::string str);
 
 		proc_t get_proc(void);
 
-		template<typename T> T* get_value(std::string param_name, std::string arg_name);
+		template<typename T> bool get_value(std::string param_name, std::string arg_name, T* value);
 
-		template<> number* get_value(std::string param_name, std::string arg_name) {
+		template<> bool get_value(std::string param_name, std::string arg_name, number* v) {
 			auto value = get_argument(get_parameter(param_name), arg_name);
-			if (value == nullptr) return nullptr;
+			if (value == nullptr) return false;
 
 			int i;
 			float f;
 			EVAL_VALUE e = std::get<EVAL_VALUE>(value->second);
-			number v;
 			switch (EvalExpression(_player, &e, &i, &f))
 			{
 			case N_INT:
 			{
-				v = i;
+				*v = i;
 				break;
 			}
 			case N_FLOAT:
 			{
-				v = f;
+				*v = f;
 				break;
 			}
 			default:
@@ -57,33 +57,33 @@ namespace stx::state::processor {
 				break;
 			}
 			}
-			return &v;
+			return true;
 		}
 
-		template<> int* get_value(std::string param_name, std::string arg_name) {
+		template<> bool get_value(std::string param_name, std::string arg_name, int* v) {
 			auto value = get_argument(get_parameter(param_name), arg_name);
-			if (value == nullptr) return nullptr;
+			if (value == nullptr) return false;
 
 			EVAL_VALUE e = std::get<EVAL_VALUE>(value->second);
-			int v = EvalExpressionI(_player, &e, FALSE);
-			return &v;
+			*v = EvalExpressionI(_player, &e, FALSE);
+			return true;
 		}
 
-		template<> float* get_value(std::string param_name, std::string arg_name) {
+		template<> bool get_value(std::string param_name, std::string arg_name, float* v) {
 			auto value = get_argument(get_parameter(param_name), arg_name);
-			if (value == nullptr) return nullptr;
+			if (value == nullptr) return false;
 
 			EVAL_VALUE e = std::get<EVAL_VALUE>(value->second);
-			float v = EvalExpressionF(_player, &e);
-			return &v;
+			*v = EvalExpressionF(_player, &e);
+			return true;
 		}
 
-		template<> std::string* get_value(std::string param_name, std::string arg_name) {
+		template<> bool get_value(std::string param_name, std::string arg_name, std::string* v) {
 			auto value = get_argument(get_parameter(param_name), arg_name);
-			if (value == nullptr) return nullptr;
+			if (value == nullptr) return false;
 
-			std::string v = std::get<std::string>(value->second);
-			return &v;
+			*v = std::get<std::string>(value->second);
+			return true;
 		}
 	};
 }
