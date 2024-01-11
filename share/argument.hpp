@@ -13,7 +13,7 @@ using namespace stx::state;
 using namespace stx::mugen;
 
 namespace stx::state::argument {
-	class Argument {
+	class STCEXAPI Argument {
 	protected:
 		std::string _name;
 		PARAM_TYPE _type;
@@ -27,7 +27,7 @@ namespace stx::state::argument {
 	};
 
 	template <exp_t T>
-	class STCEXAPI Argument_Optional : public Argument {
+	class Argument_Optional : public Argument {
 	private:
 		std::variant<int, float, std::string> _value;
 	public:
@@ -66,7 +66,7 @@ namespace stx::state::argument {
 	};
 
 	template <exp_t T>
-	class STCEXAPI Argument_Required : public Argument {
+	class Argument_Required : public Argument {
 	public:
 		Argument_Required(std::string name) : Argument{ std::move(name), true } {
 			bool _required = true;

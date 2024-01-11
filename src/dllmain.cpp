@@ -23,7 +23,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
         mebius::hook::HookOnTail(stx::mugen::SCtrlRCElemFree, stx::hooking::free::freemodstate);
         PLOGD << "Hooked SCtrlRCElemFree";
 
-        mebius::loader::Plugins::create("mods/StateControllerExtension", "stx");
+        mebius::loader::Plugins::create("mods/StateControllerExtension/plugins", "stx", true);
         break;
     }
     case DLL_THREAD_ATTACH: {

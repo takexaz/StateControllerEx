@@ -11,7 +11,7 @@
 using namespace stx::state::argument;
 
 namespace stx::state::parameter {
-	class Parameter {
+	class STCEXAPI Parameter {
 	protected:
 		std::string _name;
 		bool _required;

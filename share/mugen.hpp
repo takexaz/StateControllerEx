@@ -3,8 +3,14 @@
 #include <stdint.h>
 #include <wtypes.h>
 
+#ifdef STCEX_EXPORT
+#define STCEXAPI __declspec(dllexport)
+#else
+#define STCEXAPI __declspec(dllimport)
+#endif
+
 namespace stx::state::processor {
-    class Processor;
+    class STCEXAPI Processor;
 }
 
 namespace stx::mugen {

@@ -4,13 +4,19 @@
 #include <variant>
 #include <unordered_map>
 
+#ifdef STCEX_EXPORT
+#define STCEXAPI __declspec(dllexport)
+#else
+#define STCEXAPI __declspec(dllimport)
+#endif
+
 namespace stx::mugen {
 	enum PARAM_TYPE;
-	struct EVAL_VALUE;
+	struct STCEXAPI EVAL_VALUE;
 }
 
 namespace stx::state::processor {
-	class Processor;
+	class STCEXAPI Processor;
 }
 
 namespace stx::state {
@@ -23,11 +29,11 @@ namespace stx::state {
 	using params_t = std::unordered_map <std::string, param_t*>;
 	using proc_t = BOOL(*)(stx::state::processor::Processor*, stx::mugen::PLAYER* player, stx::mugen::PLAYER_REDIRECTS* redirects);
 
-	struct RawString {
+	struct STCEXAPI RawString {
 		std::string str;
 		RawString(const char* str) : str(str) {}
 	};
-	struct QuotedString {
+	struct STCEXAPI QuotedString {
 		std::string str;
 		QuotedString(const char* str) : str(str) {}
 	};
